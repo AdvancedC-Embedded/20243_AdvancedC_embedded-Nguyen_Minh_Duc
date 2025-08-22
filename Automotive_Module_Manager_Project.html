@@ -1,0 +1,172 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>BÀI TẬP MINI PROJECT: QUẢN LÝ TRẠNG THÁI MODULE TRONG HỆ THỐNG Ô TÔ</title>
+<style>
+  :root{
+    --bg:#0f172a;           /* slate-900 */
+    --panel:#111827;        /* gray-900 */
+    --card:#0b1220;
+    --text:#e5e7eb;         /* gray-200 */
+    --muted:#94a3b8;        /* slate-400 */
+    --accent:#22d3ee;       /* cyan-400 */
+    --accent-2:#a78bfa;     /* violet-400 */
+    --code-bg:#0b1020;
+    --border:#1f2937;       /* gray-800 */
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:linear-gradient(180deg,var(--bg),#060914);
+    color:var(--text); font:16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu;
+    padding:3rem 1rem;
+  }
+  .container{
+    max-width:980px; margin:0 auto; background:rgba(255,255,255,0.02);
+    border:1px solid var(--border); border-radius:18px; overflow:hidden;
+    box-shadow:0 10px 40px rgba(0,0,0,.35);
+  }
+  header{
+    padding:2.25rem 2rem; background:radial-gradient(1000px 400px at 10% -10%, rgba(34,211,238,.15), transparent),
+                           radial-gradient(800px 300px at 90% -20%, rgba(167,139,250,.14), transparent),
+                           linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,0));
+    border-bottom:1px solid var(--border);
+  }
+  h1{margin:0; font-size:clamp(1.6rem,2.8vw,2.3rem); letter-spacing:.3px}
+  .subtitle{color:var(--muted); margin-top:.5rem}
+  main{padding:2rem; display:grid; gap:2rem}
+  h2{font-size:1.35rem; color:white; margin:1rem 0 .25rem}
+  h3{font-size:1.05rem; color:white; margin:1rem 0 .25rem}
+  p{margin:.5rem 0}
+  ul,ol{margin:.3rem 0 .9rem 1.15rem}
+  code, pre{font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace}
+  pre{
+    background:var(--code-bg); color:#e6edf3; padding:1rem 1.25rem; border-radius:12px;
+    border:1px solid var(--border); overflow:auto; box-shadow: inset 0 0 0 1px rgba(255,255,255,.02);
+  }
+  code.inline{background:var(--code-bg); padding:.15rem .35rem; border-radius:6px; border:1px solid var(--border)}
+  .section{background:rgba(255,255,255,0.015); border:1px solid var(--border); border-radius:14px; padding:1.25rem}
+  .kicker{color:var(--accent); font-weight:600; text-transform:uppercase; font-size:.8rem; letter-spacing:.12em}
+  .callout{border-left:3px solid var(--accent); background:rgba(34,211,238,.06); padding:1rem 1.1rem; border-radius:10px}
+  .tree{white-space:pre; font-size:.95rem}
+  .grid-2{display:grid; grid-template-columns:1fr; gap:1rem}
+  @media(min-width:880px){ .grid-2{grid-template-columns:1fr 1fr} }
+  footer{padding:1.25rem 2rem; color:var(--muted); border-top:1px solid var(--border); background:#0a0f1d}
+  .badge{display:inline-block; background:rgba(167,139,250,.15); border:1px solid var(--border);
+         padding:.2rem .5rem; border-radius:999px; font-size:.8rem; color:#dcd7ff}
+</style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>BÀI TẬP MINI PROJECT: QUẢN LÝ TRẠNG THÁI MODULE TRONG HỆ THỐNG Ô TÔ</h1>
+    </header>
+    <main>
+      <section class="section">
+        <h2><span class="kicker">Mục tiêu</span></h2>
+        <p>Thiết kế và triển khai một hệ thống quản lý trạng thái các module trong ô tô, sử dụng các kỹ thuật lập trình C quan trọng như bitmask, struct &amp; union, function pointer, setjmp/longjmp, và cấp phát động (malloc/free).</p>
+        <p>Bài tập này giúp hiểu cách quản lý và điều khiển các module như động cơ (ECU), phanh (ABS), đèn, điều hòa, cảm biến nhiệt độ trong xe hơi.</p>
+      </section>
+
+      <section class="section">
+        <h2>I. MÔ TẢ CHI TIẾT PROJECT</h2>
+
+        <h3>1. Bối cảnh bài toán</h3>
+        <p>Hệ thống ô tô hiện đại có nhiều ECU (Electronic Control Unit) để điều khiển các chức năng khác nhau. Mỗi ECU đại diện cho một module (động cơ, hệ thống phanh, cảm biến,...) và các module này có trạng thái ON/OFF, lỗi, cảnh báo.</p>
+        <p>Trong project này, học viên sẽ xây dựng một chương trình mô phỏng việc quản lý và kiểm soát trạng thái các module trong ô tô. Chương trình phải có khả năng:</p>
+        <ul>
+          <li>Thêm/Xóa module vào danh sách (dùng cấp phát động).</li>
+          <li>Quản lý trạng thái ON/OFF, lỗi, cảnh báo (bitmask).</li>
+          <li>Sử dụng function pointer để điều khiển module.</li>
+          <li>Dùng setjmp/longjmp để xử lý lỗi khi module gặp sự cố.</li>
+          <li>Tối ưu lưu trữ dữ liệu module bằng struct và union.</li>
+        </ul>
+
+        <h3>2. Các thành phần chính</h3>
+        <h4>Struct quản lý module</h4>
+        <ul>
+          <li>Mỗi module có ID, tên, trạng thái, quyền truy cập, hành động điều khiển.</li>
+          <li>Trạng thái module dùng bitmask để lưu ON/OFF, lỗi, cảnh báo.</li>
+          <li>Mảng động chứa danh sách các module (dùng malloc/realloc/free).</li>
+        </ul>
+
+        <h4>Bitmask để quản lý trạng thái</h4>
+        <pre><code>#define STATUS_ON        (1 &lt;&lt; 0)  // Module đang bật
+#define STATUS_ERROR     (1 &lt;&lt; 1)  // Module gặp lỗi
+#define STATUS_WARNING   (1 &lt;&lt; 2)  // Cảnh báo lỗi</code></pre>
+
+        <h4>Function Pointer để điều khiển module</h4>
+        <p>Dùng con trỏ hàm để thực hiện bật/tắt, kiểm tra trạng thái module.</p>
+        <p>Mỗi module có thể có các hành động riêng.</p>
+
+        <h4>Xử lý lỗi bằng Setjmp/Longjmp</h4>
+        <p>Nếu module gặp lỗi, hệ thống sẽ nhảy về trạng thái an toàn mà không dừng chương trình.</p>
+      </section>
+
+      <section class="section">
+        <h2>II. CẤU TRÚC THƯ MỤC VÀ FILE</h2>
+        <pre class="tree"><code>Automotive_Module_Manager/
+├── main.c              // Chương trình chính
+├── module_manager.c    // Xử lý danh sách module
+├── module_manager.h    // Header file của module manager
+├── bitmask_utils.c     // Hàm hỗ trợ bitmask
+├── bitmask_utils.h     // Header file cho bitmask
+├── function_handler.c  // Xử lý con trỏ hàm
+├── function_handler.h  // Header file của function handler
+├── error_handler.c     // Xử lý lỗi
+├── error_handler.h     // Header file xử lý lỗi</code></pre>
+      </section>
+
+      <section class="section">
+        <h2>III. CÁC BƯỚC THỰC HIỆN</h2>
+
+        <h3>Bước 1: Phân tích yêu cầu</h3>
+        <ul>
+          <li>Hiểu cách hệ thống module trên ô tô hoạt động.</li>
+          <li>Xác định danh sách module sẽ quản lý: Động cơ, ABS, Đèn, Điều hòa, Cảm biến nhiệt độ...</li>
+          <li>Xác định trạng thái của mỗi module (ON/OFF, lỗi, cảnh báo).</li>
+          <li>Lập kế hoạch quản lý module bằng mảng động.</li>
+        </ul>
+
+        <h3>Bước 2: Thiết kế cấu trúc dữ liệu</h3>
+        <ul>
+          <li>Thiết kế struct Module để lưu thông tin module.</li>
+          <li>Dùng Union để tối ưu bộ nhớ trạng thái.</li>
+        </ul>
+
+        <h3>Bước 3: Triển khai chức năng quản lý module</h3>
+        <ul>
+          <li>Cấp phát động để lưu danh sách module.</li>
+          <li>Hàm thêm module.</li>
+          <li>Hàm xóa module.</li>
+          <li>Hàm kiểm tra trạng thái module.</li>
+        </ul>
+
+        <h3>Bước 4: Xử lý lỗi với Setjmp/Longjmp</h3>
+        <p>Nếu module gặp lỗi, chương trình quay về trạng thái an toàn.</p>
+
+        <h3>Bước 5: Vẽ Flowchart</h3>
+        <p>Vẽ flowchart theo quy trình.</p>
+      </section>
+
+      <section class="section">
+        <h2>IV. YÊU CẦU BÀI NỘP</h2>
+        <ul>
+          <li>Source code đầy đủ theo cấu trúc thư mục trên.</li>
+          <li><span class="badge">README.md</span> giải thích cách chạy chương trình.</li>
+          <li>Tài liệu thiết kế (project_design.md):</li>
+          <ul>
+            <li>Mô tả project.</li>
+            <li>Phân tích thiết kế.</li>
+            <li>Cách sử dụng bitmask, function pointer, setjmp.</li>
+            <li>Flowchart chương trình.</li>
+          </ul>
+        </ul>
+      </section>
+    </main>
+    </footer>
+  </div>
+</body>
+</html>
